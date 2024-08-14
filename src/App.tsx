@@ -1,35 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { Box, VStack } from '@chakra-ui/react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import Layout from './components/Layout';
+import TokenCreator from './components/TokenCreator';
+import TokenMinter from './components/TokenMinter';
+import TokenTransfer from './components/TokenTransfer';
+import TokenBurner from './components/TokenBurner';
+import TokenDelegator from './components/TokenDelegator';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Layout>
+      <VStack spacing={4} align="stretch">
+        <Box>
+          <WalletMultiButton />
+        </Box>
+        <TokenCreator />
+        <TokenMinter />
+        <TokenTransfer />
+        <TokenBurner />
+        <TokenDelegator />
+      </VStack>
+    </Layout>
+  );
+};
 
-export default App
+export default App;
