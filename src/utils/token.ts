@@ -1,10 +1,11 @@
-import { Connection, PublicKey, Keypair, Transaction } from '@solana/web3.js';
+import { Connection, PublicKey, Keypair, Transaction, sendAndConfirmTransaction } from '@solana/web3.js';
 import {
   createMint,
   getOrCreateAssociatedTokenAccount,
   mintTo,
   transfer,
   burn,
+  Account,
   createApproveInstruction,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
@@ -15,19 +16,21 @@ export const createToken = async (
   name: string,
   symbol: string
 ): Promise<PublicKey> => {
-  const mint = Keypair.generate();
-  const tx = new Transaction().add(
-    await createMint(
-      connection,
-      payer,
-      payer,
-      payer,
-      9,
-      mint.publicKey
-    )
+  // For simplicity, we're using the payer as the mint authority and freeze authority
+  // In a real-world scenario, you might want to use a different keypair
+  const mintAuthority = payer;
+  const freezeAuthority = payer;
+
+  const tokenMint = await createMint(
+    connection,
+    payer,
+    mintAuthority,
+    freezeAuthority,
+    9 // 9 here refers to 9 decimal places
   );
-  await connection.sendTransaction(tx, [mint]);
-  return mint.publicKey;
+
+  console.log(`Token created: ${tokenMint.toBase58()}`);
+  return tokenMint;
 };
 
 export const mintToken = async (
@@ -39,16 +42,27 @@ export const mintToken = async (
 ): Promise<string> => {
   const mint = new PublicKey(mintAddress);
   const to = new PublicKey(recipient);
-  const tokenAccount = await getOrCreateAssociatedTokenAccount(connection, payer, mint, to);
-  const tx = await mintTo(
+
+  // Get the token account of the recipient. If it does not exist, create it
+  const toTokenAccount = await getOrCreateAssociatedTokenAccount(
     connection,
     payer,
     mint,
-    tokenAccount.address,
-    payer,
-    amount * (10 ** 9)
+    to
   );
-  return tx;
+
+  // Mint tokens to the recipient
+  const signature = await mintTo(
+    connection,
+    payer,
+    mint,
+    toTokenAccount.address,
+    payer, // Assuming the payer is also the mint authority
+    amount * (10 ** 9) // Assuming 9 decimal places
+  );
+
+  console.log(`Minted ${amount} tokens to ${recipient}. Signature: ${signature}`);
+  return signature;
 };
 
 export const transferToken = async (
@@ -60,17 +74,35 @@ export const transferToken = async (
 ): Promise<string> => {
   const mint = new PublicKey(mintAddress);
   const to = new PublicKey(recipient);
-  const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, payer, mint, payer);
-  const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, payer, mint, to);
-  const tx = await transfer(
+
+  // Get the token account of the from wallet. If it does not exist, create it
+  const fromTokenAccount = await getOrCreateAssociatedTokenAccount(
+    connection,
+    payer,
+    mint,
+    payer
+  );
+
+  // Get the token account of the to wallet. If it does not exist, create it
+  const toTokenAccount = await getOrCreateAssociatedTokenAccount(
+    connection,
+    payer,
+    mint,
+    to
+  );
+
+  // Transfer tokens to the recipient
+  const signature = await transfer(
     connection,
     payer,
     fromTokenAccount.address,
     toTokenAccount.address,
     payer,
-    amount * (10 ** 9)
+    amount * (10 ** 9) // Assuming 9 decimal places
   );
-  return tx;
+
+  console.log(`Transferred ${amount} tokens from ${payer.toBase58()} to ${recipient}. Signature: ${signature}`);
+  return signature;
 };
 
 export const burnToken = async (
@@ -80,16 +112,27 @@ export const burnToken = async (
   amount: number
 ): Promise<string> => {
   const mint = new PublicKey(mintAddress);
-  const tokenAccount = await getOrCreateAssociatedTokenAccount(connection, payer, mint, payer);
-  const tx = await burn(
+
+  // Get the token account of the payer. If it does not exist, create it
+  const tokenAccount = await getOrCreateAssociatedTokenAccount(
+    connection,
+    payer,
+    mint,
+    payer
+  );
+
+  // Burn tokens
+  const signature = await burn(
     connection,
     payer,
     tokenAccount.address,
     mint,
     payer,
-    amount * (10 ** 9)
+    amount * (10 ** 9) // Assuming 9 decimal places
   );
-  return tx;
+
+  console.log(`Burned ${amount} tokens. Signature: ${signature}`);
+  return signature;
 };
 
 export const delegateToken = async (
@@ -101,16 +144,27 @@ export const delegateToken = async (
 ): Promise<string> => {
   const mint = new PublicKey(mintAddress);
   const delegatePublicKey = new PublicKey(delegate);
-  const tokenAccount = await getOrCreateAssociatedTokenAccount(connection, payer, mint, payer);
-  const tx = new Transaction().add(
-    createApproveInstruction(
-      tokenAccount.address,
-      delegatePublicKey,
-      payer,
-      amount * (10 ** 9),
-      [],
-      TOKEN_PROGRAM_ID
-    )
+
+  // Get the token account of the payer. If it does not exist, create it
+  const tokenAccount = await getOrCreateAssociatedTokenAccount(
+    connection,
+    payer,
+    mint,
+    payer
   );
-  return await connection.sendTransaction(tx, []);
+
+  // Create the delegate instruction
+  const delegateInstruction = createApproveInstruction(
+    tokenAccount.address,
+    delegatePublicKey,
+    payer,
+    amount * (10 ** 9) // Assuming 9 decimal places
+  );
+
+  // Create and send the transaction
+  const transaction = new Transaction().add(delegateInstruction);
+  const signature = await sendAndConfirmTransaction(connection, transaction, []);
+
+  console.log(`Delegated ${amount} tokens to ${delegate}. Signature: ${signature}`);
+  return signature;
 };

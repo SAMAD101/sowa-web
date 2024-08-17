@@ -5,21 +5,42 @@ import { useWallet } from '@solana/wallet-adapter-react';
 interface SolanaWalletContextProps {
   connection: Connection;
   publicKey: PublicKey | null;
+  balance: number | null;
+  sendTransaction: any; // Specify the type of useWallet as any
 }
 
 const SolanaWalletContext = createContext<SolanaWalletContextProps | undefined>(undefined);
 
 export const SolanaWalletProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
-  const [connection, setConnection] = useState<Connection>(new Connection(clusterApiUrl('devnet')));
-  const { publicKey } = useWallet();
+  const [connection] = useState<Connection>(() => new Connection(clusterApiUrl('devnet')));
+  const [balance, setBalance] = useState<number | null>(null);
+  const { publicKey, sendTransaction } = useWallet();
 
   useEffect(() => {
-    const conn = new Connection(clusterApiUrl('devnet'));
-    setConnection(conn);
-  }, []);
+    if (publicKey) {
+      const fetchBalance = async () => {
+        try {
+          const bal = await connection.getBalance(publicKey);
+          setBalance(bal / 1e9); // Convert lamports to SOL
+        } catch (error) {
+          console.error('Error fetching balance:', error);
+          setBalance(null);
+        }
+      };
+
+      fetchBalance();
+      const id = connection.onAccountChange(publicKey, () => fetchBalance());
+
+      return () => {
+        connection.removeAccountChangeListener(id);
+      };
+    } else {
+      setBalance(null);
+    }
+  }, [connection, publicKey]);
 
   return (
-    <SolanaWalletContext.Provider value={{ connection, publicKey }}>
+    <SolanaWalletContext.Provider value={{ connection, publicKey, balance, sendTransaction }}>
       {children}
     </SolanaWalletContext.Provider>
   );
