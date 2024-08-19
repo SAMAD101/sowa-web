@@ -3,18 +3,19 @@ import { Box, Button, Input, VStack, Text, useToast } from '@chakra-ui/react';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { delegateToken } from '../utils/token';
 import { PublicKey } from '@solana/web3.js';
+import { useToken } from '../contexts/TokenContext';
 
 const TokenDelegator: React.FC = () => {
-  const [tokenMint, setTokenMint] = useState('');
   const [amount, setAmount] = useState('');
   const [delegate, setDelegate] = useState('');
+  const { tokenMint } = useToken();
   const { connection, publicKey, sendTransaction } = useSolanaWallet();
   const toast = useToast();
 
   const handleDelegateToken = async () => {
     if (!publicKey) return;
     try {
-      const mintPublicKey = new PublicKey(tokenMint);
+      const mintPublicKey = tokenMint ? new PublicKey(tokenMint) : new PublicKey('');
       const delegatePublicKey = new PublicKey(delegate);
       const signature = await delegateToken(
         connection,
@@ -47,7 +48,6 @@ const TokenDelegator: React.FC = () => {
     <Box>
       <Text fontSize="xl" fontWeight="bold" mb={4}>Delegate Tokens</Text>
       <VStack spacing={4} align="stretch">
-        <Input placeholder="Token Mint Address" value={tokenMint} onChange={(e) => setTokenMint(e.target.value)} />
         <Input placeholder="Amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <Input placeholder="Delegate Address" value={delegate} onChange={(e) => setDelegate(e.target.value)} />
         <Button onClick={handleDelegateToken} isDisabled={!publicKey || !tokenMint || !amount || !delegate}>Delegate Token</Button>

@@ -3,17 +3,18 @@ import { Box, Button, Input, VStack, Text, useToast } from '@chakra-ui/react';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { burnToken } from '../utils/token';
 import { PublicKey } from '@solana/web3.js';
+import { useToken } from '../contexts/TokenContext';
 
 const TokenBurner: React.FC = () => {
-  const [tokenMint, setTokenMint] = useState('');
   const [amount, setAmount] = useState('');
+  const { tokenMint } = useToken();
   const { connection, publicKey, sendTransaction } = useSolanaWallet();
   const toast = useToast();
 
   const handleBurnToken = async () => {
     if (!publicKey) return;
     try {
-      const mintPublicKey = new PublicKey(tokenMint);
+      const mintPublicKey = tokenMint ? new PublicKey(tokenMint) : new PublicKey('');
       const signature = await burnToken(
         connection,
         publicKey,
@@ -44,7 +45,6 @@ const TokenBurner: React.FC = () => {
     <Box>
       <Text fontSize="xl" fontWeight="bold" mb={4}>Burn Tokens</Text>
       <VStack spacing={4} align="stretch">
-        <Input placeholder="Token Mint Address" value={tokenMint} onChange={(e) => setTokenMint(e.target.value)} />
         <Input placeholder="Amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <Button onClick={handleBurnToken} isDisabled={!publicKey || !tokenMint || !amount}>Burn Token</Button>
       </VStack>

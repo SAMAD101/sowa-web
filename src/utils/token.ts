@@ -26,7 +26,7 @@ export async function createMint(
     connection: Connection, 
     options?: SendTransactionOptions
   ) => Promise<TransactionConfirmationStrategy>
-): Promise<PublicKey> {
+): Promise<PublicKey | null> {
   const mintKeypair = Keypair.generate();
   const lamports = await getMinimumBalanceForRentExemptMint(connection);
 

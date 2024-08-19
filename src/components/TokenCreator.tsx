@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Box, Button, Input, VStack, Text, useToast } from '@chakra-ui/react';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { createMint } from '../utils/token';
+import { useToken } from '../contexts/TokenContext';
 
 const TokenCreator: React.FC = () => {
   const [decimals, setDecimals] = useState(9);
-  const [tokenMint, setTokenMint] = useState('');
+  const { setTokenMint } = useToken();
   const { connection, publicKey, sendTransaction } = useSolanaWallet();
   const toast = useToast();
 
@@ -20,10 +21,10 @@ const TokenCreator: React.FC = () => {
         decimals,
         sendTransaction
       );
-      setTokenMint(mint.toBase58);
+      setTokenMint(mint);
       toast({
         title: 'Token Created',
-        description: `New token created with mint: ${mint.toBase58()}`,
+        description: `New token created with mint: ${mint ? mint.toBase58() : ''}`,
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -46,7 +47,6 @@ const TokenCreator: React.FC = () => {
       <VStack spacing={4} align="stretch">
         <Input placeholder="Decimal" value={decimals} onChange={(e) => setDecimals(+e.target.value)} />
         <Button onClick={handleCreateToken} isDisabled={!publicKey || !decimals}>Create Token</Button>
-        {tokenMint && <Text>Token Mint: {tokenMint}</Text>}
       </VStack>
     </Box>
   );

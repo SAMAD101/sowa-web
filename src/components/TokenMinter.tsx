@@ -3,18 +3,19 @@ import { Box, Button, Input, VStack, Text, useToast } from '@chakra-ui/react';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { mintToken } from '../utils/token';
 import { PublicKey } from '@solana/web3.js';
+import { useToken } from '../contexts/TokenContext'
 
 const TokenMinter: React.FC = () => {
-  const [tokenMint, setTokenMint] = useState('');
   const [amount, setAmount] = useState('');
   const [recipient, setRecipient] = useState('');
+  const { tokenMint } = useToken();
   const { connection, publicKey, sendTransaction } = useSolanaWallet();
   const toast = useToast();
 
   const handleMintToken = async () => {
     if (!publicKey) return;
     try {
-      const mintPublicKey = new PublicKey(tokenMint);
+      const mintPublicKey = tokenMint ? new PublicKey(tokenMint) : new PublicKey('');
       const destination = new PublicKey(recipient);
       const signature = await mintToken(
         connection,
@@ -47,7 +48,6 @@ const TokenMinter: React.FC = () => {
     <Box>
       <Text fontSize="xl" fontWeight="bold" mb={4}>Mint Tokens</Text>
       <VStack spacing={4} align="stretch">
-        <Input placeholder="Token Mint Address" value={tokenMint} onChange={(e) => setTokenMint(e.target.value)} />
         <Input placeholder="Amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <Input placeholder="Recipient Address" value={recipient} onChange={(e) => setRecipient(e.target.value)} />
         <Button onClick={handleMintToken} isDisabled={!publicKey || !tokenMint || !amount || !recipient}>Mint Token</Button>

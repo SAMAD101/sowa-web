@@ -6,6 +6,7 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 import { SolanaWalletProvider } from './contexts/SolanaWalletContext';
+import { TokenProvider } from './contexts/TokenContext';
 
 import App from './App'
 
@@ -29,7 +30,9 @@ const Main = () => {
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <SolanaWalletProvider>
+            <TokenProvider>
             <App />
+            </TokenProvider>
           </SolanaWalletProvider>
         </WalletModalProvider>
       </WalletProvider>
