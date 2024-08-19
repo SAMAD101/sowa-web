@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     nodePolyfills({
-      include: ['buffer', 'process'],
+      include: ['buffer', 'process', 'util', 'stream', 'events'],
     }),
   ],
   css: {
@@ -15,13 +15,15 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      process: 'process/browser',
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
       buffer: 'buffer',
     },
   },
   define: {
-    'process.env': {},
     global: 'globalThis',
+    'process.env': process.env,
+    'process.version': JSON.stringify(process.version),
   },
 })
