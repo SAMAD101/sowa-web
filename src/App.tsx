@@ -7,15 +7,28 @@ import TokenTransfer from './components/TokenTransfer';
 import TokenBurner from './components/TokenBurner';
 import TokenDelegator from './components/TokenDelegator';
 
+import { TokenProvider, useToken } from './contexts/TokenContext'
+
+
 const App: React.FC = () => {
+  const { tokenMint } = useToken();
+
   return (
     <ChakraProvider>
       <Layout>
-        <TokenCreator />
-        <TokenMinter />
-        <TokenTransfer />
-        <TokenBurner />
-        <TokenDelegator />
+        {
+          tokenMint ? (
+            <>
+              <TokenMinter />
+              <TokenTransfer />
+              <TokenBurner />
+              <TokenDelegator />
+            </>
+          ) : (
+            <TokenCreator />
+          )
+        }
+        
       </Layout>
     </ChakraProvider>
   );

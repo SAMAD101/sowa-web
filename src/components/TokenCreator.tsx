@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Input, VStack, Text, useToast } from '@chakra-ui/react';
+import { Box, Button, VStack, Text, useToast, Slider, SliderTrack, SliderFilledTrack, SliderThumb } from '@chakra-ui/react';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { createMint } from '../utils/token';
 import { useToken } from '../contexts/TokenContext';
@@ -33,7 +33,7 @@ const TokenCreator: React.FC = () => {
       console.error('Error creating token:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create token',
+        description: (error as Error).message,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -45,7 +45,19 @@ const TokenCreator: React.FC = () => {
     <Box>
       <Text fontSize="xl" fontWeight="bold" mb={4}>Create New Token Mint</Text>
       <VStack spacing={4} align="stretch">
-        <Input placeholder="Decimal" value={decimals} onChange={(e) => setDecimals(+e.target.value)} />
+        <Text color="black" align="center">{decimals}</Text>
+        <Slider
+          defaultValue={decimals}
+          min={0}
+          max={9}
+          step={1}
+          onChange={(value) => setDecimals(value)}
+        >
+          <SliderTrack>
+            <SliderFilledTrack />
+          </SliderTrack>
+          <SliderThumb />
+        </Slider>
         <Button onClick={handleCreateToken} isDisabled={!publicKey || !decimals}>Create Token</Button>
       </VStack>
     </Box>
