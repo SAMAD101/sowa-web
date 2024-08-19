@@ -44,6 +44,7 @@ const TokenCreator: React.FC = () => {
   return (
     <Box>
       <Text fontSize="xl" fontWeight="bold" mb={4}>Create New Token Mint</Text>
+      <Text fontSize="xl" fontWeight="bold" mb={4}>Decimals:</Text>
       <VStack spacing={4} align="stretch">
         <Text color="black" align="center">{decimals}</Text>
         <Slider
