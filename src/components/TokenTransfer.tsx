@@ -2,18 +2,29 @@ import React, { useState } from 'react';
 import { Box, Button, Input, VStack, Text, useToast } from '@chakra-ui/react';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { transferToken } from '../utils/token';
+import { PublicKey } from '@solana/web3.js';
 
 const TokenTransfer: React.FC = () => {
   const [tokenMint, setTokenMint] = useState('');
   const [amount, setAmount] = useState('');
   const [recipient, setRecipient] = useState('');
-  const { connection, publicKey } = useSolanaWallet();
+  const { connection, publicKey, sendTransaction } = useSolanaWallet();
   const toast = useToast();
 
   const handleTransferToken = async () => {
     if (!publicKey) return;
     try {
-      const signature = await transferToken(connection, publicKey, tokenMint, recipient, parseFloat(amount));
+      const mintPublicKey = new PublicKey(tokenMint);
+      const destination = new PublicKey(recipient)
+      const signature = await transferToken(
+        connection, 
+        publicKey, 
+        mintPublicKey,
+        publicKey,
+        destination,
+        parseFloat(amount),
+        sendTransaction
+      );
       toast({
         title: 'Tokens Transferred',
         description: `Transferred ${amount} tokens. Tx: ${signature}`,

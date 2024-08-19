@@ -2,18 +2,28 @@ import React, { useState } from 'react';
 import { Box, Button, Input, VStack, Text, useToast } from '@chakra-ui/react';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { delegateToken } from '../utils/token';
+import { PublicKey } from '@solana/web3.js';
 
 const TokenDelegator: React.FC = () => {
   const [tokenMint, setTokenMint] = useState('');
   const [amount, setAmount] = useState('');
   const [delegate, setDelegate] = useState('');
-  const { connection, publicKey } = useSolanaWallet();
+  const { connection, publicKey, sendTransaction } = useSolanaWallet();
   const toast = useToast();
 
   const handleDelegateToken = async () => {
     if (!publicKey) return;
     try {
-      const signature = await delegateToken(connection, publicKey, tokenMint, delegate, parseFloat(amount));
+      const mintPublicKey = new PublicKey(tokenMint);
+      const delegatePublicKey = new PublicKey(delegate);
+      const signature = await delegateToken(
+        connection,
+        publicKey,
+        mintPublicKey,
+        delegatePublicKey,
+        parseFloat(amount),
+        sendTransaction
+      );
       toast({
         title: 'Tokens Delegated',
         description: `Delegated ${amount} tokens. Tx: ${signature}`,

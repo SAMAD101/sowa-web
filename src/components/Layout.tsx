@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Container maxW="container.xl" py={8}>
         <VStack spacing={8} align="stretch">
           <Flex justifyContent="space-between" alignItems="center">
-            <Heading as="h1" size="xl">Solana Token Manager</Heading>
+            <Heading as="h1" size="xl">Sam Wallet</Heading>
             <WalletMultiButton />
           </Flex>
           
@@ -31,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Box>
 
           <Box as="footer" textAlign="center" pt={8}>
-            <Text>© 2023 Solana Token Manager. All rights reserved.</Text>
+            <Text>Sam made with love by <Link href="https://x.com/BlueCircle0" isExternal color="blue.500">Sam</Link></Text>
             <Link href="https://solana.com" isExternal color="blue.500">Learn more about Solana</Link>
           </Box>
         </VStack>

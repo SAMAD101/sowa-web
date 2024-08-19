@@ -1,27 +1,27 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
+import React, { createContext, useContext, useState, useMemo } from 'react';
+import { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
 
 interface SolanaWalletContextProps {
   connection: Connection;
   publicKey: PublicKey | null;
   balance: number | null;
-  sendTransaction: any; // Specify the type of useWallet as any
+  sendTransaction: any;
 }
 
 const SolanaWalletContext = createContext<SolanaWalletContextProps | undefined>(undefined);
 
 export const SolanaWalletProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   const [connection] = useState<Connection>(() => new Connection(clusterApiUrl('devnet')));
-  const [balance, setBalance] = useState<number | null>(null);
   const { publicKey, sendTransaction } = useWallet();
+  const [balance, setBalance] = useState<number | null>(null);
 
-  useEffect(() => {
+  useMemo(() => {
     if (publicKey) {
       const fetchBalance = async () => {
         try {
           const bal = await connection.getBalance(publicKey);
-          setBalance(bal / 1e9); // Convert lamports to SOL
+          setBalance(bal / LAMPORTS_PER_SOL); // Convert lamports to SOL
         } catch (error) {
           console.error('Error fetching balance:', error);
           setBalance(null);

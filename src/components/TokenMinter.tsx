@@ -2,18 +2,28 @@ import React, { useState } from 'react';
 import { Box, Button, Input, VStack, Text, useToast } from '@chakra-ui/react';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { mintToken } from '../utils/token';
+import { PublicKey } from '@solana/web3.js';
 
 const TokenMinter: React.FC = () => {
   const [tokenMint, setTokenMint] = useState('');
   const [amount, setAmount] = useState('');
   const [recipient, setRecipient] = useState('');
-  const { connection, publicKey } = useSolanaWallet();
+  const { connection, publicKey, sendTransaction } = useSolanaWallet();
   const toast = useToast();
 
   const handleMintToken = async () => {
     if (!publicKey) return;
     try {
-      const signature = await mintToken(connection, publicKey, tokenMint, recipient, parseFloat(amount));
+      const mintPublicKey = new PublicKey(tokenMint);
+      const destination = new PublicKey(recipient);
+      const signature = await mintToken(
+        connection,
+        publicKey,
+        mintPublicKey,
+        destination,
+        publicKey,
+        parseFloat(amount),
+        sendTransaction);
       toast({
         title: 'Tokens Minted',
         description: `Minted ${amount} tokens. Tx: ${signature}`,
