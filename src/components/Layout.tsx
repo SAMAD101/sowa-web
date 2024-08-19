@@ -3,7 +3,7 @@ import { Box, Container, VStack, Heading, Text, Flex, Link } from '@chakra-ui/re
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
  
-import bg_image from '../assets/bg.jpg'
+import bg_webp from '../assets/bg.webp'
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <Box
       minHeight="100vh" bg="gray.100" 
-      backgroundImage={bg_image}
+      backgroundImage={bg_webp}
       backgroundSize="cover"
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
