@@ -7,12 +7,15 @@ import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 import { SolanaWalletProvider } from './contexts/SolanaWalletContext';
 import { TokenProvider } from './contexts/TokenContext';
+import { Buffer } from 'buffer';
 
 import App from './App'
 
 import './App.css'
 import './index.css'
 import '@solana/wallet-adapter-react-ui/styles.css';
+
+window.Buffer = Buffer;
 
 const Main = () => {
   const network = WalletAdapterNetwork.Devnet;
