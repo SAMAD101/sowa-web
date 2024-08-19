@@ -7,4 +7,15 @@ export default defineConfig({
   css: {
     postcss: './postcss.config.js',
   },
+  resolve: {
+    alias: {
+      crypto: 'crypto-browserify',
+      stream: 'stream-browserify',
+      buffer: 'buffer',
+    },
+  },
+  define: {
+    'process.env': {},
+    global: 'globalThis',
+  },
 })
