@@ -4,15 +4,13 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
  
 import bg_image from '../assets/bg.jpg'
+
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { publicKey, balance } = useSolanaWallet();
-  const myStyle = {
-    backgroundImage: {bg_image}
-  };
 
   return (
     <Box

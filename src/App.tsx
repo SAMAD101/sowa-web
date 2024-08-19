@@ -7,7 +7,7 @@ import TokenTransfer from './components/TokenTransfer';
 import TokenBurner from './components/TokenBurner';
 import TokenDelegator from './components/TokenDelegator';
 
-import { TokenProvider, useToken } from './contexts/TokenContext'
+import { useToken } from './contexts/TokenContext'
 
 
 const App: React.FC = () => {
